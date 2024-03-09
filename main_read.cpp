@@ -1,35 +1,37 @@
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <iomanip>
 using namespace std;
 
 int main() {
-    int N;
+    ifstream inputFile("students.txt");
 
-    ofstream outputFile("students.txt");
-
-    if (!outputFile.is_open()) {
+    if (!inputFile.is_open()) {
         cout << "Error: Unable to open the file." << endl;
         return 1;
     }
 
-    cout << "Enter the number of students: ";
-    cin >> N;
-
-    outputFile << N << endl;
+    int N;
+    inputFile >> N;
 
     for (int i = 0; i < N; ++i) {
         string name;
         int score1, score2;
 
-        cout << "Enter name and two scores for student " << (i + 1) << ": ";
-        cin >> name >> score1 >> score2;
+        inputFile >> name >> score1 >> score2;
 
-        outputFile << name << " " << score1 << " " << score2 << endl;
+        int sum = score1 + score2;
+        float avg = sum / 2.0f;
+
+        cout << "Student Name: " << setw(10) << left << name
+             << " score1: " << setw(5) << score1
+             << " score2: " << setw(5) << score2
+             << " Sum: " << setw(5) << sum
+             << " Avg: " << setw(5) << fixed << setprecision(2) << avg << endl;
     }
 
-    outputFile.close();
-
-    cout << "Student information saved to students.txt" << endl;
+    inputFile.close();
 
     return 0;
 }
