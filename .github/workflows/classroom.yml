@@ -1,0 +1,40 @@
+name: Autograding Tests
+'on':
+- push
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Compile and File Creation Test
+      id: compile-and-file-creation-test
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: Compile and File Creation Test
+        setup-command: ''
+        command: g++ -std=c++11 main_write.cpp && ./a.out < data.txt
+        timeout: 10
+    - name: Pytest for file contents
+      id: pytest-for-file-contents
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: Pytest for file contents
+        setup-command: sudo -H pip3 install pytest
+        command: pytest -rP
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: education/autograding-grading-reporter@v1
+      env:
+        COMPILE-AND-FILE-CREATION-TEST_RESULTS: "${{steps.compile-and-file-creation-test.outputs.result}}"
+        PYTEST-FOR-FILE-CONTENTS_RESULTS: "${{steps.pytest-for-file-contents.outputs.result}}"
+      with:
+        runners: compile-and-file-creation-test,pytest-for-file-contents
